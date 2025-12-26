@@ -1,0 +1,29 @@
+[
+  {
+    "timestamp": "2025-01-01T10:00:00",
+    "client_ip": "10.0.0.1",
+    "method": "POST",
+    "endpoint": "/api/login",
+    "status": 200,
+    "request_size": 512,
+    "response_time_ms": 120
+  },
+  {
+    "timestamp": "2025-01-01T10:00:05",
+    "client_ip": "10.0.0.1",
+    "method": "POST",
+    "endpoint": "/api/login",
+    "status": 200,
+    "request_size": 520,
+    "response_time_ms": 115
+  },
+  {
+    "timestamp": "2025-01-01T10:01:00",
+    "client_ip": "192.168.1.50",
+    "method": "POST",
+    "endpoint": "/api/login",
+    "status": 401,
+    "request_size": 900,
+    "response_time_ms": 300
+  }
+]
