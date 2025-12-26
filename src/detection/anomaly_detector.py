@@ -1,9 +1,26 @@
-def detect_anomalies(features):
+def detect_anomalies(endpoint_features, baseline):
     anomalies = []
-    for f in features:
-        if f['response_time_ms'] > 250 or f['request_size'] > 800:
-            anomalies.append({
-                "feature" : f,
-                "score" : 0.8
-            })
+
+    for endpoint, records in endpoint_features.items():
+        if endpoint not in baseline:
+            continue
+
+        base = baseline[endpoint]
+
+        for r in records:
+            score = 0
+
+            if r["response_time_ms"] > base["avg_rt"] + 2 * base["std_rt"]:
+                score += 0.5
+
+            if r["request_size"] > base["avg_size"] + 2 * base["std_size"]:
+                score += 0.5
+
+            if score >= 0.5:
+                anomalies.append({
+                    "endpoint": endpoint,
+                    "record": r,
+                    "score": score
+                })
+
     return anomalies
