@@ -1,8 +1,17 @@
 def recommend_rule(anomaly):
-    f = anomaly["feature"]
+    endpoint = anomaly["endpoint"]
+    score = anomaly["score"]
+
+    if score >= 1.0:
+        action = "RATE_LIMIT"
+        confidence = "HIGH"
+    else:
+        action = "MONITOR"
+        confidence = "MEDIUM"
+
     return {
-        "action": "RATE_LIMIT",
-        "endpoint": f["endpoint"],
-        "confidence": "HIGH",
-        "reason": "Repeated abnormal request pattern"
+        "action": action,
+        "endpoint": endpoint,
+        "confidence": confidence,
+        "reason": "Behavior deviates significantly from learned baseline"
     }
