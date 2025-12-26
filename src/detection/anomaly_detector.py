@@ -1,26 +1,45 @@
-def detect_anomalies(endpoint_features, baseline):
+def detect_anomalies(grouped_features, baseline):
     anomalies = []
 
-    for endpoint, records in endpoint_features.items():
-        if endpoint not in baseline:
+    for key, records in grouped_features.items():
+        if key not in baseline:
             continue
 
-        base = baseline[endpoint]
+        endpoint, client_ip = key
+        base = baseline[key]
 
         for r in records:
             score = 0
+            reasons = []
 
-            if r["response_time_ms"] > base["avg_rt"] + 2 * base["std_rt"]:
-                score += 0.5
+            # Dynamic thresholding
+            rt_threshold = (
+                base["avg_rt"] + 2 * base["std_rt"]
+                if base["std_rt"] > 0
+                else base["avg_rt"] * 1.5
+            )
 
-            if r["request_size"] > base["avg_size"] + 2 * base["std_size"]:
+            size_threshold = (
+                base["avg_size"] + 2 * base["std_size"]
+                if base["std_size"] > 0
+                else base["avg_size"] * 1.5
+            )
+
+            if r["response_time_ms"] > rt_threshold:
                 score += 0.5
+                reasons.append("response time unusually high")
+
+            if r["request_size"] > size_threshold:
+                score += 0.5
+                reasons.append("request size unusually large")
 
             if score >= 0.5:
                 anomalies.append({
                     "endpoint": endpoint,
+                    "client_ip": client_ip,
                     "record": r,
-                    "score": score
+                    "score": score,
+                    "reasons": reasons
                 })
 
     return anomalies

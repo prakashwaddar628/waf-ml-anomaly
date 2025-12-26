@@ -6,20 +6,31 @@ from explanation.explainer import explain
 from policy.rule_recommender import recommend_rule
 
 def main():
+    print(">>> Program started")
+
     logs = read_logs("data/sample_logs.json")
+    print(f">>> Logs loaded: {len(logs)}")
 
-    endpoint_features = build_features(logs)
-    baseline = compute_baseline(endpoint_features)
+    grouped_features = build_features(logs)
+    print(f">>> Groups created: {len(grouped_features)}")
+    print(">>> Group keys:", grouped_features.keys())
 
-    anomalies = detect_anomalies(endpoint_features, baseline)
+    baseline = compute_baseline(grouped_features)
+    print(f">>> Baselines computed: {len(baseline)}")
+    print(">>> Baseline keys:", baseline.keys())
+
+    anomalies = detect_anomalies(grouped_features, baseline)
+    print(f">>> Anomalies detected: {len(anomalies)}")
 
     for anomaly in anomalies:
-        explanation = explain(anomaly, baseline)
+        explanation = explain(anomaly)
         rule = recommend_rule(anomaly)
 
         print("\n=== ANOMALY DETECTED ===")
         print(explanation)
         print("Recommended Rule:", rule)
+
+    print(">>> Program finished")
 
 if __name__ == "__main__":
     main()
