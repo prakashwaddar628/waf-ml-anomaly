@@ -4,6 +4,7 @@ from detection.baseline import compute_baseline
 from detection.anomaly_detector import detect_anomalies
 from explanation.explainer import explain
 from policy.rule_recommender import recommend_rule
+import math
 
 def main():
     print(">>> Program started")
@@ -11,15 +12,25 @@ def main():
     logs = read_logs("data/sample_logs.json")
     print(f">>> Logs loaded: {len(logs)}")
 
-    grouped_features = build_features(logs)
-    print(f">>> Groups created: {len(grouped_features)}")
-    print(">>> Group keys:", grouped_features.keys())
+    # -------- SPLIT DATA --------
+    split_index = math.floor(len(logs) * 0.7)
+    baseline_logs = logs[:split_index]
+    detection_logs = logs[split_index:]
 
-    baseline = compute_baseline(grouped_features)
+    print(f">>> Baseline logs: {len(baseline_logs)}")
+    print(f">>> Detection logs: {len(detection_logs)}")
+
+    # -------- BUILD BASELINE --------
+    baseline_features = build_features(baseline_logs)
+    baseline = compute_baseline(baseline_features)
+
     print(f">>> Baselines computed: {len(baseline)}")
     print(">>> Baseline keys:", baseline.keys())
 
-    anomalies = detect_anomalies(grouped_features, baseline)
+    # -------- DETECTION --------
+    detection_features = build_features(detection_logs)
+    anomalies = detect_anomalies(detection_features, baseline)
+
     print(f">>> Anomalies detected: {len(anomalies)}")
 
     for anomaly in anomalies:
